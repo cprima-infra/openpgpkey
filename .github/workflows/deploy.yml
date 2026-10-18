@@ -1,0 +1,49 @@
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+  check:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check WKD objects over HTTPS
+        run: |
+          base=https://openpgpkey.cpmx.de/.well-known/openpgpkey/cpmx.de
+          curl -fsS --retry 10 --retry-delay 15 --retry-all-errors -o /dev/null "$base/policy"
+          found=0
+          for f in public/.well-known/openpgpkey/cpmx.de/hu/*; do
+            name=$(basename "$f")
+            [ "$name" = .gitkeep ] && continue
+            found=1
+            size=$(curl -fsS --retry 10 --retry-delay 15 --retry-all-errors -w '%{size_download}' -o /dev/null "$base/hu/$name")
+            [ "$size" -gt 0 ] || { echo "empty: $name"; exit 1; }
+          done
+          [ "$found" = 1 ] || { echo "no hu/<hash> object"; exit 1; }
