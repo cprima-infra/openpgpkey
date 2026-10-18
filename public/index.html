@@ -2,8 +2,22 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>openpgpkey.cpmx.de</title>
+<style>
+body { margin: 0; background: #fdf6e3; color: #657b83; font-family: sans-serif; }
+.bar { width: 4rem; height: 0.4rem; background: #cb4b16; }
+main { max-width: 40rem; margin: 2rem 1rem; }
+code { background: #eee8d5; padding: 0.1rem 0.3rem; }
+</style>
 </head>
 <body>
+<div class="bar"></div>
+<main>
+<p>This host serves OpenPGP public keys for <code>cpmx.de</code> addresses using the Web Key Directory (WKD). It is not a website.</p>
+<p>Look up a key:</p>
+<p><code>gpg --auto-key-locate clear,wkd --locate-keys dev@cpmx.de</code></p>
+<p>Contact: <a href="mailto:admin@cpmx.de">admin@cpmx.de</a></p>
+</main>
 </body>
 </html>
